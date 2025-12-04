@@ -10,6 +10,7 @@
             --text-color: #e0e0e0;
             --card-color: #1e1e1e;
             --border-color: #333;
+            --error-color: #ff4d4d;
         }
 
         body {
@@ -33,6 +34,11 @@
             position: static;
             width: auto;
             height: auto;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            z-index: 1000;
         }
 
         header {
@@ -62,6 +68,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative; /* For error message positioning */
         }
 
         .media-card img,
@@ -70,6 +77,23 @@
             height: 100%;
             object-fit: cover; /* Ensures media fills the card without distortion */
             display: block;
+        }
+
+        .media-card .error-message {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--error-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -106,7 +130,7 @@
                 "G6rKUNXWQAEZShX.jpeg", "G6rnl3WaUAAv45b.gif", "G6t5KFZbgAAGPsd.jpeg", "G6t5KFhboAAqbLP.jpeg", "G6tnkera0AQzPHu.jpeg",
                 "G6uYmN7W4AA_Nij.jpeg", "G6ujXKJa0AMlNLU.jpeg", "G6xMUu3WoAA8DWh.jpeg", "G7A-dRFaMAAPpxe.jpeg", "G7APtOvbkAAH3LM.jpeg",
                 "G7ARaQbbQAAlQF7.jpeg", "G7B-x6CWMAAZVJ5.gif", "G7Eg2UCacAACv3g.jpeg", "G7HbkmVbgAAxwmm.jpeg", "G7HfQ5eXMAA-EHR.jpeg",
-g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCkT.jpeg", "GvRZgtjWAAASVKJ.jpeg", "IMG_0025.gif",
+                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCkT.jpeg", "GvRZgtjWAAASVKJ.jpeg", "IMG_0025.gif",
                 "IMG_0042.gif", "IMG_0043.gif", "IMG_0071.gif", "IMG_0073.gif", "IMG_0075.gif", "IMG_0085.gif", "IMG_0128.gif",
                 "IMG_0137.gif", "IMG_0145.gif", "IMG_0249.gif", "IMG_0252.gif", "IMG_0307.gif", "IMG_0308.gif", "IMG_0309.gif",
                 "IMG_0310.gif", "IMG_0311.gif", "IMG_0312.gif", "IMG_0316.gif", "IMG_0317.gif", "IMG_0319.gif", "IMG_0320.gif",
@@ -122,7 +146,7 @@ g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCk
                 "IMG_0523.gif", "IMG_0524.gif", "IMG_0525.gif", "IMG_0526.gif", "IMG_0527.gif", "IMG_0528.gif", "IMG_0529.gif",
                 "IMG_0531.gif", "IMG_0532.gif", "IMG_0533.gif", "IMG_0534.gif", "IMG_0535.gif", "IMG_0536.gif", "IMG_0537.gif",
                 "IMG_0538.gif", "IMG_0539.gif", "IMG_0540.gif", "IMG_0541.gif", "IMG_0542.gif", "IMG_0543.gif", "IMG_0544.gif",
-                "IMG_0545.gif", "IMG_0547.gif", "IMG__0548.gif", "IMG_0549.gif", "IMG_0550.gif", "IMG_0551.gif", "IMG_0552.gif",
+                "IMG_0545.gif", "IMG_0547.gif", "IMG_0548.gif", "IMG_0549.gif", "IMG_0550.gif", "IMG_0551.gif", "IMG_0552.gif",
                 "IMG_0553.gif", "IMG_0554.gif", "IMG_0555.gif", "IMG_0556.gif", "IMG_0557.gif", "IMG_0558.gif", "IMG_0559.gif",
                 "IMG_0560.gif", "IMG_0561.gif", "IMG_0562.gif", "IMG_0563.gif", "IMG_0564.gif", "IMG_0565.gif", "IMG_0566.gif",
                 "IMG_0567.gif", "IMG_0568.gif", "IMG_0569.gif", "IMG_0570.gif", "IMG_0571.gif", "IMG_0572.gif", "IMG_0612.gif",
@@ -156,7 +180,7 @@ g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCk
 
             const grid = document.getElementById('main-content');
             const imageExtensions = ['.gif', '.jpeg', '.jpg', '.png', '.webp'];
-            const videoExtensions = ['.mp4', '.mov', '.webm'];
+            const videoExtensions = ['.mp4', '.mov', '.webm']; // Added .mov
 
             mediaFiles.forEach(file => {
                 const encodedFile = encodeURIComponent(file);
@@ -169,6 +193,9 @@ g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCk
                     img.src = encodedFile;
                     img.alt = file;
                     img.loading = 'lazy'; // Smart lazy loading for images
+                    img.onerror = function() {
+                        this.parentNode.innerHTML = `<div class="error-message">Failed to load image: ${file}</div>`;
+                    };
                     card.appendChild(img);
                 } else if (videoExtensions.includes(extension)) {
                     const video = document.createElement('video');
@@ -177,6 +204,9 @@ g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCk
                     video.muted = true; // Autoplay requires video to be muted
                     video.playsInline = true;
                     video.preload = 'metadata'; // Smart: only load metadata initially
+                    video.onerror = function() {
+                        this.parentNode.innerHTML = `<div class="error-message">Failed to load video: ${file}</div>`;
+                    };
                     
                     // Allow user to unmute on click
                     video.addEventListener('click', () => {
@@ -184,6 +214,9 @@ g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCk
                     });
 
                     card.appendChild(video);
+                } else {
+                    // Handle unknown file types or files that are not images/videos
+                    card.innerHTML = `<div class="error-message">Unsupported file type: ${file}</div>`;
                 }
                 grid.appendChild(card);
             });
@@ -193,7 +226,15 @@ g                "GSAX0-AXkAAJJgv.jpeg", "GT1ACnCbwAA11xV.jpeg", "GutWcV5XcAAsCk
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.play().catch(e => console.error("Autoplay failed:", e));
+                        // Only attempt to play if not already playing and not paused by user
+                        if (entry.target.paused) {
+                            entry.target.play().catch(e => {
+                                // Catch and log autoplay errors, but don't block the page
+                                console.warn(`Autoplay prevented for ${entry.target.src}:`, e);
+                                // Optionally, show a play button if autoplay is blocked
+                                // entry.target.controls = true; 
+                            });
+                        }
                     } else {
                         entry.target.pause();
                     }
